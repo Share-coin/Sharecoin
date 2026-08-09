@@ -17,20 +17,20 @@ though - see the prebuilt-package callout right below, or
 rather use prebuilt binaries there instead.
 
 **Just want to get mining, no cloning or building?** Grab a prebuilt
-package from [Releases](https://github.com/TVHeroes/sharecoin/releases/latest) -
+package from [Releases](https://github.com/Share-coin/sharecoin/releases/latest) -
 Windows gets a portable wallet + launchers (unzip, then follow
 [START-HERE.txt](START-HERE.txt)); Linux gets `sharecoind`/`sharecoin-cli`/
 `sharecoin-util`/`sharecoin-qt` all in one tarball (the GUI wallet needs
 Qt6 runtime libraries already installed - see the README.txt inside the
 tarball for exact package names per distro).
 
-**Want something even simpler?** [Sharecoin Simple Wallet](https://github.com/TVHeroes/sharecoin-simple-wallet)
+**Want something even simpler?** [Sharecoin Simple Wallet](https://github.com/Share-coin/sharecoin-simple-wallet)
 is a single portable app for casual users: open it, get a wallet, click
 a button, start mining, no config files or flags involved. It bundles
 its own GPU miner too, so there's nothing else to download separately.
 Windows only for now.
 
-**On Android?** [Sharecoin Android Wallet](https://github.com/TVHeroes/sharecoin-android-mobile-app)
+**On Android?** [Sharecoin Android Wallet](https://github.com/Share-coin/sharecoin-android-mobile-app)
 is a lightweight SPV wallet (send, receive, QR codes) for your phone -
 grab the APK from that repo's Releases page.
 

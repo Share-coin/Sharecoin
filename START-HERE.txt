@@ -73,7 +73,7 @@ IF SOMETHING GOES WRONG
   while and has catching up to do. Give it a few minutes.
 - Anything else, or if you want to understand how this actually works
   under the hood: see README.md and the docs/ folder, or the source at
-  github.com/TVHeroes/sharecoin.
+  github.com/Share-coin/sharecoin.
 
 
 That's the whole thing. Have fun.

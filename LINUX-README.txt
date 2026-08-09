@@ -110,4 +110,4 @@ normal desktop driver install; missing GPU-passthrough setups like WSL
 may need it added separately).
 
 
-Full source, docs, and the beacon spec: github.com/TVHeroes/sharecoin
+Full source, docs, and the beacon spec: github.com/Share-coin/sharecoin
