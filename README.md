@@ -253,6 +253,14 @@ something in, pick a future block height, and watch it settle from that
 block's actual beacon value once it's mined. Anyone can verify the result
 themselves from the numbers shown on the page.
 
+**Beyond demos - real payouts**: [sharecoin.cc/daily-raffle](https://sharecoin.cc/daily-raffle/)
+pays a real 1 SHC to a real winner every day at 12:00 UTC, no signup - enter your address once
+and you're eligible for every draw for 30 days. There's also a Discord bot (`/raffle create` for
+a self-serve join-by-button raffle, `/raffle manual` for a pre-collected address list) that runs
+the same verifiable draw inside any server and pays winners directly from a dedicated prize
+wallet, same beacon mechanic, same "nobody can know the result early" guarantee as everything
+else here.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). Bitcoin Core's own copyright is preserved
