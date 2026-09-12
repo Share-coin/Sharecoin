@@ -81,7 +81,7 @@ build on going forward.
 ## Contact
 Forum - https://bitcointalk.org/index.php?topic=5588928
 
-Discord - https://discord.gg/RcRWE7vbG
+Discord - https://discord.gg/mUv7nW5rQH
 
 Email - contact@sharecoin.cc
 
