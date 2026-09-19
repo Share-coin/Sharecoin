@@ -210,6 +210,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256::FromUserHex("bce15d4f0f9d2d7ba03064da56007ea0a437d7da74eaadc2260b0d435fcec312").value());
 
         vSeeds.clear();
+        vSeeds.emplace_back("seed.sharecoin.cc.");
         vSeeds.emplace_back("sharecoin.duckdns.org.");
 
         // Distinct from both real Bitcoin (0/5/128) and sharenet's own
