@@ -44,6 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the diff below needs the previous commit
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
@@ -53,6 +55,7 @@ jobs:
           for f in $SPEC_FILES; do
             if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -qx "$f"; then
               echo "Re-stamping $f (content changed in this push)"
+              rm -f "$f.ots"  # ots refuses to overwrite an existing proof
               ots stamp "$f"
             fi
           done
