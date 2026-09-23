@@ -21,12 +21,9 @@ a consensus-level fork):
   active chain. It errors out, naming exactly how many more blocks are
   needed, if the window isn't fully confirmed yet.
 - `window_size` must be between 2 and 10000. `window_size=1` is rejected by
-  the RPC itself, not just discouraged in docs: a window of one block is
-  exactly the naive single-`mix_hash` design this beacon exists to replace,
-  with zero protection against the withhold-and-retry bias described above.
-  Any `window_size` above 1 still provides only bounded, not complete,
-  protection (see the table below) - this floor removes the one value that
-  provides *no* protection at all, it does not certify 2 as a safe choice.
+  the RPC itself. This is a historical safeguard, not a security boundary:
+  see the erratum under Version 2, a window of 1 is no easier to bias than a
+  window of 8.
 - The value itself is the SHA-256 of the `mix_hash` values of that window's
   blocks, concatenated in order. Any node can recompute it independently
   from data it has already validated.
@@ -45,7 +42,68 @@ records what this repository's own reference implementations currently
 use, so that changing them later means a new tagged version of this file,
 not a silent edit.
 
-## Version 1 (current)
+## Version 2 (current, 2026-09-23)
+
+This version corrects Version 1's security claims. It does not change any
+parameter. Version 1 said a larger window bounds a miner's influence more
+tightly and that `window_size=1` gives "zero protection". Both were wrong.
+The miner who finds the block that completes the window sees the finished value
+before deciding whether to publish it, whatever the window size, and can discard
+the block and try again (losing that block's reward). The window size does not
+change how much that is worth. The size of the bias depends on the miner's share
+of the hashrate, and nothing else.
+
+What a miner with share `a` of the hashrate can do, when the outcome they want
+has probability `q` by chance:
+
+    P(get the outcome they want) = q / (1 - a(1 - q))
+    most they can multiply their odds by = 1 / (1 - a)
+
+| Hashrate share a | Coin flip (q = 0.5) | 100-entrant raffle, chance to win vs fair |
+|---|---|---|
+| 10% | 52.6% | x1.11 |
+| 25% | 57.1% | x1.33 |
+| 33% | 59.9% | x1.49 |
+| 40% | 62.5% | x1.66 |
+| 49% | 66.2% | x1.94 |
+
+These figures come from `docs/analysis/beacon_bias_sim.py`, which simulates the
+real construction (SHA-256 over concatenated `mix_hash` values) and gives the same
+result for window sizes 1, 2, 8 and 100. The one-bit case matches the analysis in
+Bonneau, Clark and Goldfeder, "On Bitcoin as a public randomness source" (2015),
+which bounds the attack by the block reward the attacker gives up. SHC has no market
+price, so this spec makes no claim about what an attack costs in money.
+
+The bound holds only if:
+
+- no single miner holds a majority of the hashrate (above 50% a miner can rewrite the
+  window and retry, and there is no useful bound);
+- the inputs (entrants, options, the thing being drawn from) were committed before the
+  block that completes the window was found;
+- nobody holds several of the last blocks of the window privately. That takes about
+  `a^k` luck for `k` blocks, so it matters mostly for large `a`.
+
+Recommendations:
+
+1. Commit inputs at least one block before the block that completes the window.
+2. Check the largest miner's current share at https://sharecoin.cc/beacon/ before relying on
+   a result. If one miner holds a majority, do not use the beacon for anything that matters.
+3. If withholding matters for your use, add a delay of several block intervals after the value
+   is known, see docs/VDF-WRAPPER-SPEC.md. A 10 minute delay on this 2 minute chain leaves about
+   5% of the bias in simulation.
+4. Pick any window you like. 8 is a convenience default, not a security parameter.
+
+| Parameter | Value | Notes |
+|---|---|---|
+| Reference window size | 8 blocks | Unchanged. Not a security parameter, the bias bound does not depend on it. |
+| Lead time before locking a target height | At least 1 block | See the Version 1 table for what each demo uses. |
+| Minimum confirmations before treating a result as final | 0 beyond the window itself | Unchanged. |
+
+## Version 1 (superseded by Version 2)
+
+**Erratum, 2026-09-23:** the sentence "Larger windows bound an attacker's influence more
+tightly" in the table below was wrong. See Version 2. The text is left as originally
+published so the record stays accurate.
 
 | Parameter | Value | Notes |
 |---|---|---|

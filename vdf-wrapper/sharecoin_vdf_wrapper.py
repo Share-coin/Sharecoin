@@ -6,15 +6,12 @@ Applies a Wesolowski VDF (class groups of imaginary quadratic order - no
 trusted setup, via the vendored chiavdf in vdf-wrapper/vendor/chiavdf/) on
 top of getrandombeacon's raw output.
 
-This does NOT shrink the residual miner-grinding bias that window_size
-already bounds (see docs/BEACON-SPEC.md and docs/DETAILS.md's "Randomness
-beacon, in full" section): VDF non-parallelizability is per-input, not
-across candidate inputs, so an attacker with a handful of parallel
-machines can still evaluate every one of their bounded candidate outcomes
-within the delay. What this DOES add: removing the first-mover timing
-edge of whoever validates a beacon window's last block first - everyone,
-including that node operator, must wait the same enforced, non-skippable
-sequential delay before the derived value is usable. See
+What the delay adds: the miner who finds the last block of a window sees the raw
+beacon value first and could discard the block if they dislike it. A delay of several
+block intervals makes that a blind gamble, and it also removes the timing edge of
+whoever validates the window's last block first. Everyone, including that node
+operator, waits the same enforced sequential delay before the value is usable. It does
+not help against a miner with a majority of the hashrate. See
 docs/VDF-WRAPPER-SPEC.md for the full threat model and the versioned,
 benchmarked parameters (discriminant size, iteration count, and what
 real-world delay that corresponds to on reference hardware).

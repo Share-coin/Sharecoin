@@ -180,10 +180,10 @@ Live web apps rather than standalone scripts, all linked from
   exactly the sortition-selector pattern already built above. First draft
   of the pitch had two factual errors, corrected in the second pass:
   - Claimed the beacon makes manipulation "mathematically impossible",
-    corrected to the actual model: economically discouraged and bounded
-    (biasing it needs controlling multiple consecutive blocks in the
-    window, each forfeiting a real block reward and risking being
-    orphaned), not literally impossible.
+    corrected to the actual model: bounded, not literally impossible.
+    A miner who finds the last block of the window can discard it and
+    try again, forfeiting that block's reward, so what a miner can gain
+    depends on their share of the hashrate (docs/BEACON-SPEC.md).
   - Claimed the audit roster is proven via a "Zero-Knowledge Proof",
     corrected: nothing here is zero-knowledge (which proves a statement
     without revealing the underlying data). This is the opposite, full

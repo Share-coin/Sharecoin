@@ -231,9 +231,12 @@ instead of joining that one, and GPU batch-size quirks at low difficulty.
 ## Randomness beacon
 
 `getrandombeacon start_height (window_size)` is a public, verifiable
-randomness source derived from already-confirmed blocks, designed to
-resist the "last revealer" bias that a single block's own `mix_hash`
-would have. See `docs/DETAILS.md` for the full design rationale, or
+randomness source derived from already-confirmed blocks. Nobody can know the
+value before the blocks are mined, but the miner who finds the last block of
+the window sees it first and can discard the block and try again, so how much
+a miner can bias it depends on their share of the hashrate (window size does
+not change that). See `docs/DETAILS.md` for the numbers and
+https://sharecoin.cc/beacon/ for the live largest-miner share, or
 [WHITEPAPER.pdf](WHITEPAPER.pdf) for the formal writeup.
 
 **Blockchain Explorer** - https://sharecoin.cc/explorer/
@@ -258,8 +261,9 @@ pays a real 1 SHC to a real winner every day at 12:00 UTC, no signup - enter you
 and you're eligible for every draw for 30 days. There's also a Discord bot (`/raffle create` for
 a self-serve join-by-button raffle, `/raffle manual` for a pre-collected address list) that runs
 the same verifiable draw inside any server and pays winners directly from a dedicated prize
-wallet, same beacon mechanic, same "nobody can know the result early" guarantee as everything
-else here.
+wallet, same beacon mechanic and the same limits as everything else here (the operator
+cannot know or choose the result, but a miner who finds the last block of the window can
+influence it a little, see docs/BEACON-SPEC.md).
 
 ## License
 

@@ -1285,18 +1285,13 @@ static RPCMethod getrandombeacon()
         "window_size consecutive blocks starting at start_height, only once every block "
         "in that window is already confirmed on the active chain.\n"
         "\n"
-        "Combining several blocks' mix_hash values (rather than using a single block's "
-        "own mix_hash) mitigates the \"last revealer\" bias: a miner who finds a block "
-        "sees its mix_hash before deciding whether to broadcast it, and could otherwise "
-        "freely withhold and retry until they get one they prefer. Biasing this combined "
-        "value requires controlling multiple CONSECUTIVE blocks in the window - to do so, "
-        "an attacker must forfeit a real, already-earned block reward and race being "
-        "orphaned by someone else's competing block, for a bounded, quantifiable amount of "
-        "influence (one bit per block they control in the window), not full control of the "
-        "outcome. This does not eliminate bias entirely (see this project's own README/notes) "
-        "but bounds it to a small, known amount that shrinks as window_size grows. window_size=1 "
-        "is rejected: it is exactly the single-block bias this RPC exists to prevent, with no "
-        "mitigation at all.\n",
+        "The value is the SHA-256 of the mix_hash values of those blocks, concatenated in "
+        "order. Nobody can know it before the blocks are mined, but the miner who finds the "
+        "last block of the window sees it first and can discard that block (forfeiting its "
+        "reward) and try again. A miner with share a of the hashrate can therefore raise the "
+        "chance of an outcome they prefer by at most a factor 1/(1-a), whatever window_size "
+        "is. The bound does not hold if one miner has a majority of the hashrate. See "
+        "docs/BEACON-SPEC.md.\n",
         {
             {"start_height", RPCArg::Type::NUM, RPCArg::Optional::NO, "the first block height in the combination window"},
             {"window_size", RPCArg::Type::NUM, RPCArg::Default{100}, "how many consecutive blocks' mix_hash values to combine (2-10000)"},
@@ -1324,9 +1319,7 @@ static RPCMethod getrandombeacon()
     }
     if (window_size < 2 || window_size > 10000) {
         throw JSONRPCError(RPC_INVALID_PARAMETER,
-            "window_size must be between 2 and 10000 (window_size=1 would provide no "
-            "protection against the single-block withhold-and-retry bias this RPC exists "
-            "to prevent - see docs/BEACON-SPEC.md)");
+            "window_size must be between 2 and 10000");
     }
 
     const int end_height{start_height + window_size - 1};

@@ -1,6 +1,6 @@
 """
 Sharecoin sortition selector: pick a committee (auditors, jurors, reviewers)
-from a candidate pool using a public, verifiable, unbiased random draw.
+from a candidate pool using a public, verifiable random draw.
 
 Same underlying mechanic as the raffle demo: waits for a real future block
 height (chosen at the moment it's reached, not pre-guessed from a calendar

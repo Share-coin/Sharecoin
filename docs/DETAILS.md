@@ -210,21 +210,35 @@ anything that needs unpredictable-in-advance, publicly-verifiable
 randomness (a lottery, fair matchmaking, sortition), without running any
 separate randomness service.
 
-Why not just use one block's own `mix_hash`? Whoever mines a block sees its
-`mix_hash` before deciding whether to broadcast it, so they could withhold
-and re-mine until they get a value they like - free for them, since they
-keep re-trying at no extra cost until satisfied. `getrandombeacon` instead
-combines the `mix_hash` of `window_size` **consecutive** confirmed blocks
-(SHA-256 of them concatenated in order). Biasing the combined result now
-requires controlling multiple consecutive blocks in that window, not just
-one - each block an attacker wants to bias costs them a real, already-earned
-block reward they must forfeit, and races them against being orphaned by a
-competing miner's block. This bounds their influence to roughly one bit per
-block they control in the window, shrinking as `window_size` grows - the
-same withhold-and-bias tradeoff Ethereum's own RANDAO accepts, not a
-Verifiable Delay Function (a true VDF needs specialized hardware to be
-useful and would just favor whoever has the fastest one, working against
-the ASIC-resistance ProgPoW is chosen for in the first place).
+What the beacon does and does not protect against. Nobody can know the value
+before the blocks in the window are mined. But the miner who finds the last
+block of the window sees the finished value before deciding whether to publish
+it, and can discard the block and let the race restart if they dislike it. That
+costs them the block reward and they have to win the race again. It works the
+same for any `window_size`, including 1. Combining several blocks only means
+the value depends on several miners, so a miner who found an earlier block
+cannot steer it. It is not a defence against withholding, and an earlier
+version of this section that said a larger window bounds the bias more tightly
+was wrong (see the erratum in docs/BEACON-SPEC.md).
+
+What limits the bias is the attacker's share of the hashrate. A miner with share
+`a` who wants an outcome that would come up with probability `q` by chance gets
+it with probability `q / (1 - a(1 - q))`, so the most they can multiply their
+odds by is `1 / (1 - a)`. For a coin flip, 10% of the hashrate gives 52.6%, 33%
+gives 59.9% and 49% gives 66.2%. This assumes no miner holds a majority: above
+50% they can rewrite the window and retry, and there is no useful bound. It
+also assumes the inputs (entrants, options) were committed before the last block
+of the window was found. `docs/analysis/beacon_bias_sim.py` reproduces the
+numbers. The live largest-miner share is at https://sharecoin.cc/beacon/.
+
+Withheld blocks cost the block reward, but SHC has no market price yet, so
+this document makes no claim about what an attack costs in money.
+
+A delay after the value is known helps against withholding: the miner then has
+to decide before they can learn the result, and if another miner finds a block
+in the meantime theirs is orphaned. See docs/VDF-WRAPPER-SPEC.md for the numbers.
+The same design tradeoff exists in Ethereum's RANDAO. Sharecoin's window is
+not a verifiable delay function and does not need special hardware.
 
 The RPC only returns a value once every block in `[start_height,
 start_height + window_size - 1]` is on the active chain - it errors out

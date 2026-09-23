@@ -5,16 +5,16 @@ beacon derived from already-mined ProgPoW mix_hash values.
 Why: a single block's own mix_hash can't safely be used as "the randomness"
 for anything, because whoever mines it sees the value before deciding
 whether to broadcast it - a miner who dislikes their own mix_hash (e.g. it
-disqualifies them from a lottery) can simply withhold the block and keep
-re-mining until they get one they prefer, for free.
+disqualifies them from a lottery) can discard the block and let the race restart
+until they get one they prefer. That costs them the block reward, but it is still a bias.
 
 Design: beacon(start) = SHA256(mix_hash[start] || mix_hash[start+1] || ...
 || mix_hash[start+window-1]) - only computable/queryable once every block
-in that window is already confirmed on the active chain. Biasing this
-combined value requires controlling multiple CONSECUTIVE blocks in the
-window, not just one - the same "last revealer" tradeoff Ethereum's own
-RANDAO accepts (bounded, quantifiable bias that shrinks as window_size
-grows, not full control of the outcome). This requires no consensus
+in that window is already confirmed on the active chain. Combining blocks does NOT remove
+the withholding bias of the last block (the miner who finds it sees the value first and can
+discard the block, whatever the window size). What limits it is the attacker's share a of the
+hashrate: the most they can multiply the odds of a preferred outcome by is 1/(1-a); see
+docs/BEACON-SPEC.md. This requires no consensus
 changes at all - it's a pure read-only derivation over already-stored,
 already-validated CBlockIndex::mix_hash values.
 
@@ -47,17 +47,13 @@ new_rpc = '''static RPCMethod getrandombeacon()
         "window_size consecutive blocks starting at start_height, only once every block "
         "in that window is already confirmed on the active chain.\\n"
         "\\n"
-        "Combining several blocks' mix_hash values (rather than using a single block's "
-        "own mix_hash) mitigates the \\"last revealer\\" bias: a miner who finds a block "
-        "sees its mix_hash before deciding whether to broadcast it, and could otherwise "
-        "freely withhold and retry until they get one they prefer. Biasing this combined "
-        "value requires controlling multiple CONSECUTIVE blocks in the window - to do so, "
-        "an attacker must forfeit a real, already-earned block reward and race being "
-        "orphaned by someone else's competing block, for a bounded, quantifiable amount of "
-        "influence (one bit per block they control in the window), not full control of the "
-        "outcome. This does not eliminate bias entirely but bounds it to a small, known "
-        "amount that shrinks as window_size grows. window_size=1 is rejected: it is exactly "
-        "the single-block bias this RPC exists to prevent, with no mitigation at all.\\n",
+        "The value is the SHA-256 of the mix_hash values of those blocks, concatenated in "
+        "order. Nobody can know it before the blocks are mined, but the miner who finds the "
+        "last block of the window sees it first and can discard that block (forfeiting its "
+        "reward) and try again. A miner with share a of the hashrate can therefore raise the "
+        "chance of an outcome they prefer by at most a factor 1/(1-a), whatever window_size "
+        "is. The bound does not hold if one miner has a majority of the hashrate. See "
+        "docs/BEACON-SPEC.md.\\n",
         {
             {"start_height", RPCArg::Type::NUM, RPCArg::Optional::NO, "the first block height in the combination window"},
             {"window_size", RPCArg::Type::NUM, RPCArg::Default{100}, "how many consecutive blocks' mix_hash values to combine (2-10000)"},
@@ -85,9 +81,7 @@ new_rpc = '''static RPCMethod getrandombeacon()
     }
     if (window_size < 2 || window_size > 10000) {
         throw JSONRPCError(RPC_INVALID_PARAMETER,
-            "window_size must be between 2 and 10000 (window_size=1 would provide no "
-            "protection against the single-block withhold-and-retry bias this RPC exists "
-            "to prevent - see docs/BEACON-SPEC.md)");
+            "window_size must be between 2 and 10000");
     }
 
     const int end_height{start_height + window_size - 1};

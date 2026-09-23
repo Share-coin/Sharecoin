@@ -11,32 +11,30 @@ and nothing previously stopped that from changing quietly.
 
 ## Read this first: what the VDF wrapper does and does not solve
 
-`getrandombeacon` already bounds the miner-grinding bias: an attacker
-controlling `k` consecutive blocks in a window has at most `2^k` candidate
-outcomes to choose from (docs/BEACON-SPEC.md, docs/DETAILS.md's
-"Randomness beacon, in full"). **The VDF wrapper does not shrink that
-bound.** A VDF's non-parallelizability is a per-input guarantee (you
-cannot speed up one evaluation with more hardware) - it says nothing about
-evaluating multiple *different* candidate inputs in parallel. An attacker
-with `k+1` machines can run all `2^k` of their candidate outcomes through
-the VDF simultaneously and still pick whichever one they prefer once the
-delay elapses. For the small `k` values a realistic attack involves, that
-is cheap. If bounding grinding bias further is the goal, the lever is
-`window_size`, not this tool.
+A raw beacon value has two weaknesses, and the wrapper helps with them to different degrees.
 
-What the VDF wrapper *does* add: right now, whoever validates a beacon
-window's last block first can read the raw `beacon` value an instant
-before anyone else - a first-mover informational edge for anything built
-on top that reacts to the beacon (a bet, a front-run trade, an early
-guess). A mandatory, equal, non-skippable sequential delay between "raw
-beacon known" and "derived value known" removes that edge for every
-party, including the node operator who saw the winning block first:
-nobody can compute the delayed output faster than anyone else, regardless
-of who saw the input first.
+1. **Withholding.** The miner who finds the block that completes the window sees the raw
+   value first and can discard the block if they dislike it (docs/BEACON-SPEC.md, Version 2).
+   If the value only becomes usable after a delay of several block intervals, that miner has
+   to decide before they can learn it. To find out they must hold the block for the whole
+   delay, and if another miner finds a block at that height in the meantime theirs is
+   orphaned. So the delay turns withholding into a mostly blind gamble. In simulation
+   (`docs/analysis/beacon_bias_sim.py`; 120 second blocks, a miner with 33% of the hashrate,
+   up to 8 candidates evaluated in parallel), a 60 second delay leaves about 70% of the bias,
+   5 minutes leaves about 20% and 10 minutes leaves about 5%.
+2. **First-mover timing edge.** Whoever validates the window's last block first can read the raw
+   value an instant before anyone else, which matters for anything that reacts to it (a bet, a
+   front-run trade, an early guess). An equal, non-skippable sequential delay removes that edge
+   for every party, including the node operator who saw the winning block first.
 
-Use this tool for the timing-fairness property. Do not present it as
-"stronger randomness" or as closing the residual grinding-bias gap -
-neither claim is accurate.
+What the delay does not do: it does not help against a miner with a majority of the hashrate,
+who can hold several blocks privately and out-wait the delay. It assumes nobody can run the VDF
+much faster than the reference hardware. And it only helps applications that actually use the
+delayed value.
+
+An earlier version of this document said the wrapper does not reduce the bias at all and that
+`window_size` is the lever for reducing it. Both were wrong: the window size does not change the
+bias, and a long enough delay does reduce it.
 
 ## What is and isn't a protocol rule
 
@@ -54,7 +52,19 @@ The one property that *is* mathematically fixed, regardless of version:
 maliciously - anyone can rederive the same group from the same beacon
 value.
 
-## Version 1 (current)
+## Version 2 (current, 2026-09-23)
+
+Corrects the "Read this first" section above. The parameters are unchanged (1024 bit
+discriminant, 28,500,000 iterations, about 5 minutes on the Pi 5). Five minutes is about 2.5
+block intervals. For a use where withholding matters, about 10 minutes (about 57,000,000
+iterations, not yet benchmarked here, so measure before relying on it) leaves about 5% of the
+bias in simulation at a 33% miner.
+
+## Version 1 (superseded by Version 2)
+
+**Erratum, 2026-09-23:** the "Read this first" section originally published with this version
+said the wrapper does not shrink the withholding bias and that `window_size` is the lever. Both
+were wrong, see Version 2. The parameters below are unchanged.
 
 | Parameter | Value | Notes |
 |---|---|---|
@@ -92,9 +102,8 @@ oracle/validator subset selection), specifically for the subset of those
 where a first-mover timing edge on the raw beacon value would matter (for
 example: an on-chain bet that resolves against the beacon, where whoever
 sees the winning block first could otherwise act on it before anyone
-else). For applications that only care about the already-bounded grinding
-bias and not about first-mover timing, this tool adds delay for no benefit
-- use the base beacon directly.
+else). For applications where neither withholding nor first-mover timing matters,
+this tool adds delay for no benefit - use the base beacon directly.
 
 ## Permanence policy
 

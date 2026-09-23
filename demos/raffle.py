@@ -87,7 +87,8 @@ def run_raffle_drawing(entry_height, beacon_height):
         return
 
     print(f"[*] Querying Sharecoin Beacon at height {beacon_height}...")
-    # Using window_size=8 as a robust default to prevent last-revealer bias.
+    # window_size=8 is a convenience default. The window size does not change how much
+    # a miner who finds the last block can bias the result (docs/BEACON-SPEC.md).
     # getrandombeacon(start_height, window_size) combines blocks
     # [start_height, start_height + window_size - 1], so start_height is set
     # to make the window END at beacon_height, not start there, otherwise
