@@ -241,6 +241,8 @@ https://sharecoin.cc/beacon/ for the live largest-miner share, or
 
 **Blockchain Explorer** - https://sharecoin.cc/explorer/
 
+**Questions and discussion** - https://github.com/Share-coin/Sharecoin/discussions
+
 ## Use cases
 
 The beacon is the basis for a handful of real, runnable demos: lotteries
