@@ -236,7 +236,7 @@ value before the blocks are mined, but the miner who finds the last block of
 the window sees it first and can discard the block and try again, so how much
 a miner can bias it depends on their share of the hashrate (window size does
 not change that). See `docs/DETAILS.md` for the numbers and
-https://sharecoin.cc/beacon/ for the live largest-miner share, or
+https://sharecoin.cc/data/miners.json for the live largest-miner share, or
 [WHITEPAPER.pdf](WHITEPAPER.pdf) for the formal writeup.
 
 **Blockchain Explorer** - https://sharecoin.cc/explorer/

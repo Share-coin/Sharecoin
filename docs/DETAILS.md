@@ -229,7 +229,7 @@ gives 59.9% and 49% gives 66.2%. This assumes no miner holds a majority: above
 50% they can rewrite the window and retry, and there is no useful bound. It
 also assumes the inputs (entrants, options) were committed before the last block
 of the window was found. `docs/analysis/beacon_bias_sim.py` reproduces the
-numbers. The live largest-miner share is at https://sharecoin.cc/beacon/.
+numbers. The live largest-miner share is at https://sharecoin.cc/data/miners.json.
 
 Withheld blocks cost the block reward, but SHC has no market price yet, so
 this document makes no claim about what an attack costs in money.

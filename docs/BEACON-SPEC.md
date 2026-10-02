@@ -86,8 +86,9 @@ The bound holds only if:
 Recommendations:
 
 1. Commit inputs at least one block before the block that completes the window.
-2. Check the largest miner's current share at https://sharecoin.cc/beacon/ before relying on
-   a result. If one miner holds a majority, do not use the beacon for anything that matters.
+2. Check the largest miner's current share at https://sharecoin.cc/data/miners.json before
+   relying on a result. If one miner holds a majority, do not use the beacon for anything
+   that matters.
 3. If withholding matters for your use, add a delay of several block intervals after the value
    is known, see docs/VDF-WRAPPER-SPEC.md. A 10 minute delay on this 2 minute chain leaves about
    5% of the bias in simulation.
