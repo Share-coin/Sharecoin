@@ -617,7 +617,10 @@ public:
         // otherwise).
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.enforce_BIP94 = opts.enforce_bip94;
-        consensus.fPowNoRetargeting = false;
+        // Regtest is now a local test chain only (mainnet holds real value):
+        // fixed difficulty, as in Bitcoin's regtest, so test suites can mine
+        // blocks on a CPU without LWMA pushing difficulty out of reach.
+        consensus.fPowNoRetargeting = true;
         consensus.nLwmaAveragingWindow = 45;
         consensus.nLwmaAdjustedWeight = 13772;
         consensus.nLwmaMinDenominator = 10;
