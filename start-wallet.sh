@@ -17,4 +17,4 @@
 # has a rough patch.
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "$DIR/datadir"
-"$DIR/sharecoin-qt" -datadir="$DIR/datadir" -addnode=sharecoin.duckdns.org:8443 -prune=550 -fallbackfee=0.0001
+"$DIR/sharecoin-qt" -datadir="$DIR/datadir" -addnode=sharecoin.duckdns.org:8443 -prune=550 -fallbackfee=0.0001 -maxtipage=1209600

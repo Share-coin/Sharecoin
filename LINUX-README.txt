@@ -49,7 +49,7 @@ Example (CLI):
 
 Example (GUI wallet):
 
-    ./sharecoin-qt -addnode=sharecoin.duckdns.org:8443 -fallbackfee=0.0001
+    ./sharecoin-qt -addnode=sharecoin.duckdns.org:8443 -fallbackfee=0.0001 -maxtipage=1209600
 
 On first run, sharecoin-qt may show a one-time disk-space notice -
 just click OK, it's informational only and not a problem.
@@ -57,7 +57,7 @@ just click OK, it's informational only and not a problem.
 
 CONNECTING TO THE LIVE NETWORK
 --------------------------------
-    ./sharecoind -addnode=sharecoin.duckdns.org:8443 -listen=0 -fallbackfee=0.0001 -daemon
+    ./sharecoind -addnode=sharecoin.duckdns.org:8443 -listen=0 -fallbackfee=0.0001 -maxtipage=1209600 -daemon
 
 A freshly built/downloaded sharecoind with no flags at all also finds
 the live network on its own via a compiled-in DNS seed - the explicit
@@ -66,6 +66,13 @@ to whatever the seed finds, rather than restricting it to just one peer.
 Use -addnode, not -connect - -connect is exclusive and disables normal
 peer discovery, leaving the node with exactly one peer and no fallback
 if that one node ever has a rough patch.
+
+-maxtipage=1209600 (14 days) keeps the node out of "initial sync" mode
+when the network goes a while without a new block. With a shorter
+setting, a node whose newest block is older than the limit refuses to
+hand out mining work, so after a quiet spell nobody could mine the next
+block. The flag sets 14 days explicitly, whichever build you are
+running.
 
 Once running, use sharecoin-cli the same way as any Bitcoin Core node
 (getbalance, getnewaddress, sendtoaddress, etc.) - or use sharecoin-qt's

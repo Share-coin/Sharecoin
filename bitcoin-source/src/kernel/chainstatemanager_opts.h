@@ -21,7 +21,10 @@
 class CChainParams;
 class ValidationSignals;
 
-static constexpr auto DEFAULT_MAX_TIP_AGE{24h};
+// Sharecoin: 14 days instead of Bitcoin's 24h. A node whose tip is older than this treats
+// itself as in initial block download, and getblocktemplate then refuses work. On a small
+// network a day without blocks would otherwise leave every node unable to mine the next one.
+static constexpr auto DEFAULT_MAX_TIP_AGE{std::chrono::hours{24 * 14}};
 static constexpr int32_t DEFAULT_PREVOUTFETCH_THREADS{8};
 
 namespace kernel {
